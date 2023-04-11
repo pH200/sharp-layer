@@ -2,8 +2,13 @@ name: Build lambda layer for sharp
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron:  '0 4 * * *'
   workflow_dispatch:
 
 jobs:
@@ -18,12 +23,12 @@ jobs:
         run: npm i -g esbuild
       - name: Install sharp - arm64
         run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm i --save-exact --arch=arm64 --platform=linux --libc=glibc sharp
-      # - name: Get sharp version
-      #   id: version
-      #   uses: notiz-dev/github-action-json-property@release
-      #   with:
-      #     path: 'package.json'
-      #     prop_path: 'dependencies.sharp'
+      - name: Get sharp version
+        id: version
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: 'package.json'
+          prop_path: 'dependencies.sharp'
       - name: esbuild - arm64
         run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
       - name: Zip - arm64
@@ -70,14 +75,31 @@ jobs:
           mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
           zip -r release-all nodejs
+
       - name: Test
         run: |
           cp test.mjs nodejs/test.mjs
           node nodejs/test.mjs
           if [ ! -f text_bw.png ]; then exit 1 ; fi
+
+      - name: Current version
+        id: version_current
+        run: echo "sharpver=$(cat VERSION)" >> $GITHUB_ENV
       - name: Create release
         uses: softprops/action-gh-release@v1
-        if: github.event_name != 'pull_request'
+        if: ${{ env.sharpver != steps.version.outputs.prop && github.event_name != 'pull_request' }}
         with:
           files: "release*"
           body: ${{steps.version.outputs.prop}}
+          tag_name: ${{steps.version.outputs.prop}}
+      - name: Update VERSION
+        if: ${{ env.sharpver != steps.version.outputs.prop && github.event_name != 'pull_request' }}
+        run: echo ${{steps.version.outputs.prop}} > VERSION
+      - name: Create commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        if: ${{ env.sharpver != steps.version.outputs.prop && github.event_name != 'pull_request' }}
+        with:
+          commit_message: ${{ env.sharpver }}
+          tagging_message: ${{ format('{0}', env.sharpver) }}
+          file_pattern: VERSION
+
