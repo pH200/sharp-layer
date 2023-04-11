@@ -34,6 +34,7 @@ jobs:
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
           mv node_modules/sharp/build nodejs/node_modules/sharp/
+          mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
           zip -r release-arm64 nodejs
       - name: Clean arm64
@@ -49,6 +50,7 @@ jobs:
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
           mv node_modules/sharp/build nodejs/node_modules/sharp/
+          mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
           zip -r release-arm64 nodejs
       - name: Clean x64
@@ -66,6 +68,7 @@ jobs:
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
           mv node_modules/sharp/build nodejs/node_modules/sharp/
+          mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
           zip -r release-arm64 nodejs
       - name: Test
