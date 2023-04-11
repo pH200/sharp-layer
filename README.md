@@ -5,7 +5,7 @@
 
 ## About
 
-The prebuilt [sharp](https://www.npmjs.com/package/sharp) npm module for AWS Lambda layer.
+The prebuilt [sharp](https://www.npmjs.com/package/sharp) node module for AWS Lambda layer.
 
 ### Features
 
