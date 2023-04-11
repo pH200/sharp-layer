@@ -1,7 +1,6 @@
 # sharp for AWS Lambda Layers
 
 [![GitHub release](https://img.shields.io/github/tag/pH200/sharp-layer.svg)](https://github.com/pH200/sharp-layer/tags)
-[![Get version action](https://github.com/pH200/sharp-layer/actions/workflows/version.yml/badge.svg)](https://github.com/pH200/sharp-layer/actions/workflows/version.yml)
 [![Build action](https://github.com/pH200/sharp-layer/actions/workflows/build.yml/badge.svg)](https://github.com/pH200/sharp-layer/actions/workflows/build.yml)
 
 ## About
