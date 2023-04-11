@@ -1,12 +1,10 @@
 name: Build lambda layer for sharp
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  workflow_run:
+    workflows: ['Get sharp version']
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
@@ -21,12 +19,12 @@ jobs:
         run: npm i -g esbuild
       - name: Install sharp - arm64
         run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm i --save-exact --arch=arm64 --platform=linux --libc=glibc sharp
-      - name: Get sharp version
-        id: version
-        uses: notiz-dev/github-action-json-property@release
-        with:
-          path: 'package.json'
-          prop_path: 'dependencies.sharp'
+      # - name: Get sharp version
+      #   id: version
+      #   uses: notiz-dev/github-action-json-property@release
+      #   with:
+      #     path: 'package.json'
+      #     prop_path: 'dependencies.sharp'
       - name: esbuild - arm64
         run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
       - name: Zip - arm64
@@ -79,12 +77,8 @@ jobs:
           node nodejs/test.mjs
           if [ ! -f text_bw.png ]; then exit 1 ; fi
       - name: Create release
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v1
         if: github.event_name != 'pull_request'
         with:
-          artifacts: "release*"
-          artifactContentType: "application/zip"
+          files: "release*"
           body: ${{steps.version.outputs.prop}}
-          tag: ${{steps.version.outputs.prop}}
-          makeLatest: true
-          skipIfReleaseExists: true
