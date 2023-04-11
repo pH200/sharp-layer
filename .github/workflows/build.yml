@@ -75,7 +75,7 @@ jobs:
         run: |
           cp test.mjs nodejs/test.mjs
           node nodejs/test.mjs
-          if [ ! -f text_bw.png ]; then exit 1 fi
+          if [ ! -f text_bw.png ]; then exit 1 ; fi
       - name: Create release
         uses: ncipollo/release-action@v1
         if: github.event_name != 'pull_request'
