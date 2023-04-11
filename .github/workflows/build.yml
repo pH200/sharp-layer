@@ -86,3 +86,5 @@ jobs:
           artifactContentType: "application/zip"
           body: ${{steps.version.outputs.prop}}
           tag: ${{steps.version.outputs.prop}}
+          makeLatest: true
+          skipIfReleaseExists: true

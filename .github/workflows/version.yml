@@ -1,0 +1,25 @@
+name: Get sharp version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 4 * * *'
+  push:
+    branches: [ 'master' ]
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: version
+      run: |
+        npm v sharp | grep -Po -m 1 '\bsharp@([0-9\.]+)' > VERSION && echo "ebver=$(cat VERSION)" >> $GITHUB_ENV
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: ${{ env.ebver }}
+        tagging_message: ${{ format('v{0}', env.ebver) }}
