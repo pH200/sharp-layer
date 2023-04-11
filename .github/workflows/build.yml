@@ -54,7 +54,7 @@ jobs:
           mv node_modules/sharp/build nodejs/node_modules/sharp/
           mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
-          zip -r release-arm64 nodejs
+          zip -r release-x64 nodejs
       - name: Clean x64
         run: rm -rf nodejs node_modules # keep package.json for keeping the version
       - name: Install sharp - all
@@ -72,7 +72,7 @@ jobs:
           mv node_modules/sharp/build nodejs/node_modules/sharp/
           mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
-          zip -r release-arm64 nodejs
+          zip -r release-all nodejs
       - name: Test
         run: |
           cp test.mjs nodejs/test.mjs
