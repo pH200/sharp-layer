@@ -1,0 +1,83 @@
+name: Build lambda layer for sharp
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install esbuild
+        run: curl -fsSL https://esbuild.github.io/dl/latest | sh
+      - name: Install sharp - arm64
+        run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm i --save-exact --arch=arm64 --platform=linux --libc=glibc sharp
+      - name: Get sharp version
+        id: version
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: 'package.json'
+          prop_path: 'dependencies.sharp'
+      - name: esbuild - arm64
+        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
+      - name: Zip - arm64
+        run: |
+          mkdir -p nodejs/node_modules/sharp/lib
+          mv index.js nodejs/node_modules/sharp/lib/
+          mv node_modules/sharp/package.json nodejs/node_modules/sharp/
+          mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
+          mv node_modules/sharp/build nodejs/node_modules/sharp/
+          mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
+          zip -r release-arm64 nodejs
+      - name: Clean arm64
+        run: rm -rf nodejs node_modules # keep package.json for keeping the version
+      - name: Install sharp - x64
+        run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm i --arch=x64 --platform=linux --libc=glibc
+      - name: esbuild - x64
+        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
+      - name: Zip - x64
+        run: |
+          mkdir -p nodejs/node_modules/sharp/lib
+          mv index.js nodejs/node_modules/sharp/lib/
+          mv node_modules/sharp/package.json nodejs/node_modules/sharp/
+          mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
+          mv node_modules/sharp/build nodejs/node_modules/sharp/
+          mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
+          zip -r release-arm64 nodejs
+      - name: Clean x64
+        run: rm -rf nodejs node_modules # keep package.json for keeping the version
+      - name: Install sharp - all
+        run: |
+          SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=glibc
+          SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm rebuild --arch=arm64 --platform=linux --libc=glibc
+      - name: esbuild - all
+        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
+      - name: Zip - all
+        run: |
+          mkdir -p nodejs/node_modules/sharp/lib
+          mv index.js nodejs/node_modules/sharp/lib/
+          mv node_modules/sharp/package.json nodejs/node_modules/sharp/
+          mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
+          mv node_modules/sharp/build nodejs/node_modules/sharp/
+          mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
+          zip -r release-arm64 nodejs
+      - name: Test
+        run: |
+          cp test.mjs nodejs/test.mjs
+          node nodejs/test.mjs
+          if [ ! -f /text_bw.png ]; then exit 1 fi
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        if: github.event_name != 'pull_request'
+        with:
+          artifacts: "release*"
+          artifactContentType: "application/zip"
+          body: ${{steps.version.outputs.propStr}}
+          tag: ${{steps.version.outputs.propStr}}
