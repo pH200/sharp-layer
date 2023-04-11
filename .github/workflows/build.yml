@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install esbuild
-        run: curl -fsSL https://esbuild.github.io/dl/latest | sh
+        run: npm i -g esbuild
       - name: Install sharp - arm64
         run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm i --save-exact --arch=arm64 --platform=linux --libc=glibc sharp
       - name: Get sharp version
