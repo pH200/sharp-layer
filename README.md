@@ -30,6 +30,29 @@ Check out [aws: Creating and sharing Lambda layers](https://docs.aws.amazon.com/
 
 This package can be used with [sst](https://sst.dev). Check out [docs.sst.dev: Lambda Layers](https://docs.sst.dev/advanced/lambda-layers) and [sst.dev: Resize Images](https://sst.dev/examples/how-to-automatically-resize-images-with-serverless.html) for examples.
 
+### Setting arm64 for sst functions
+
+```js
+function: {
+  handler: '{handler}',
+  runtime: 'nodejs18.x',
+  architecture: 'arm_64',
+  nodejs: {
+    esbuild: {
+      external: ['sharp'],
+    },
+  },
+  layers: [
+    new lambda.LayerVersion(stack, 'SharpLayer', {
+      code: lambda.Code.fromAsset('layers/sharp'),
+      compatibleArchitectures: [
+        lambda.Architecture.ARM_64
+      ]
+    }),
+  ]
+}
+```
+
 ## Build
 
 Fork this repo -> Actions -> Run build.yml
