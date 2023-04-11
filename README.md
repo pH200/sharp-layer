@@ -58,6 +58,52 @@ function: {
 }
 ```
 
+### Setting up a lambda layer for AWS SAM
+
+Providing **a zip file** locally actually works, even though it's **not** mentioned in the documentation.
+
+```yml
+  ## Lambda
+  ImageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: image-lambda/
+      Handler: app.handler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Timeout: 30
+      MemorySize: 1024
+      Layers:
+        - !Ref SharpLayer
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        # Check these two issues for problems related to esm and esbuild
+        # https://github.com/evanw/esbuild/issues/1921
+        # https://github.com/evanw/esbuild/pull/2067#issuecomment-1503688128
+        # Switch to cjs when esm doesn't work
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - app.ts
+        External:
+          - '@aws-sdk/*' # @aws-sdk 3.x is installed globally for nodejs18.x
+          - sharp # use layer
+  ## Lambda layer
+  SharpLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: sharp
+      ContentUri: layers/sharp/release-arm64.zip # zip
+      CompatibleArchitectures:
+        - arm64
+      CompatibleRuntimes:
+        - nodejs18.x
+        - nodejs16.x
+```
+
 ## Build
 
 Fork this repo -> Actions -> Run build.yml
@@ -70,4 +116,6 @@ Fork this repo -> Actions -> Run build.yml
 
 [aws: Working with layers](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-layers.html)
 
-[sharp: AWS Lambda](https://sharp.pixelplumbing.com/install#aws-lambda)
+[aws: Building layers](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-layers.html)
+
+[sharp: Installation - AWS Lambda](https://sharp.pixelplumbing.com/install#aws-lambda)
