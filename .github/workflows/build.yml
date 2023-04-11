@@ -1,7 +1,9 @@
 name: Build lambda layer for sharp
 
 on:
-  tags: ['*']
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
 
 jobs:
