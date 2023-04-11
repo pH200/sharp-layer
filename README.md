@@ -19,6 +19,12 @@ The prebuilt [sharp](https://www.npmjs.com/package/sharp) npm module for AWS Lam
 
 Please check out [Optimizing Node.js dependencies in AWS Lambda](https://aws.amazon.com/blogs/compute/optimizing-node-js-dependencies-in-aws-lambda/) for details. A bundled and minified lambda function can be up to 70% faster for cold starts. The package size is also crucial for cold start performance.
 
+## Download
+
+[**Releases**](https://github.com/pH200/sharp-layer/releases)
+
+Download latest [release-arm64.zip](https://github.com/pH200/sharp-layer/releases/latest/download/release-arm64.zip) or [release-x64.zip](https://github.com/pH200/sharp-layer/releases/latest/download/release-x64.zip)
+
 ## Usage
 
 ```js
