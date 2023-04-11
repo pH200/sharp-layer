@@ -55,7 +55,11 @@ function: {
 
 ## Build
 
-Fork this repo -> Actions -> Run build.yml
+Fork this repo -> Create a tag
+
+Or:
+
+Actions -> Run version.yml
 
 ## References
 

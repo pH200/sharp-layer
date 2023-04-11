@@ -1,10 +1,7 @@
 name: Build lambda layer for sharp
 
 on:
-  workflow_run:
-    workflows: ['Get sharp version']
-    types:
-      - completed
+  tags: ['*']
   workflow_dispatch:
 
 jobs:
