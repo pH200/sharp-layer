@@ -84,5 +84,5 @@ jobs:
         with:
           artifacts: "release*"
           artifactContentType: "application/zip"
-          body: ${{steps.version.outputs.propStr}}
-          tag: ${{steps.version.outputs.propStr}}
+          body: ${{steps.version.outputs.prop}}
+          tag: ${{steps.version.outputs.prop}}
