@@ -17,13 +17,17 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '^20.10.0'
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install esbuild
         run: npm i -g esbuild@0.18.20
 
       - name: Install sharp - arm64
-        run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm i --save-exact --arch=arm64 --platform=linux --libc=glibc sharp
+        run: npm i --save-exact --os=linux --cpu=arm64 sharp
       - name: Get sharp version
         id: version
         uses: notiz-dev/github-action-json-property@release
@@ -38,15 +42,14 @@ jobs:
           mv index.js nodejs/node_modules/sharp/lib/
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
-          mv node_modules/sharp/build nodejs/node_modules/sharp/
-          mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
+          mv node_modules/@img nodejs/node_modules/
           zip -r release-arm64 nodejs
       - name: Clean arm64
         run: rm -rf nodejs node_modules # keep package.json for keeping the version
 
       - name: Install sharp - x64
-        run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm i --arch=x64 --platform=linux --libc=glibc
+        run: npm i --save-exact --os=linux --cpu=x64 sharp
       - name: esbuild - x64
         run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
       - name: Zip - x64
@@ -55,17 +58,16 @@ jobs:
           mv index.js nodejs/node_modules/sharp/lib/
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
-          mv node_modules/sharp/build nodejs/node_modules/sharp/
-          mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
+          mv node_modules/@img nodejs/node_modules/
           zip -r release-x64 nodejs
       - name: Clean x64
         run: rm -rf nodejs node_modules # keep package.json for keeping the version
 
       - name: Install sharp - all
         run: |
-          SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=glibc
-          SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm rebuild --arch=arm64 --platform=linux --libc=glibc
+          npm i --os=linux --cpu=x64 sharp
+          npm i --os=linux --cpu=arm64 sharp
       - name: esbuild - all
         run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
       - name: Zip - all
@@ -74,9 +76,8 @@ jobs:
           mv index.js nodejs/node_modules/sharp/lib/
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
-          mv node_modules/sharp/build nodejs/node_modules/sharp/
-          mv node_modules/sharp/vendor nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
+          mv node_modules/@img nodejs/node_modules/
           zip -r release-all nodejs
 
       - name: Test
@@ -88,13 +89,6 @@ jobs:
       - name: Current version
         id: version_current
         run: echo "sharpver=$(cat PREV_VERSION)" >> $GITHUB_ENV
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        if: ${{ env.sharpver != steps.version.outputs.prop && github.event_name != 'pull_request' }}
-        with:
-          files: "release*"
-          body: ${{steps.version.outputs.prop}}
-          tag_name: ${{steps.version.outputs.prop}}
       - name: Update PREV_VERSION
         if: ${{ env.sharpver != steps.version.outputs.prop && github.event_name != 'pull_request' }}
         run: echo ${{steps.version.outputs.prop}} > PREV_VERSION
@@ -104,3 +98,10 @@ jobs:
         with:
           commit_message: ${{steps.version.outputs.prop}}
           file_pattern: PREV_VERSION
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        if: ${{ env.sharpver != steps.version.outputs.prop && github.event_name != 'pull_request' }}
+        with:
+          files: "release*"
+          body: ${{steps.version.outputs.prop}}
+          tag_name: ${{steps.version.outputs.prop}}
