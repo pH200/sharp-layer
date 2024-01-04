@@ -27,7 +27,9 @@ jobs:
         run: npm i -g esbuild@0.18.20
 
       - name: Install sharp - arm64
-        run: npm i --save-exact --os=linux --cpu=arm64 sharp
+        run: npm i --save-exact --os=linux --cpu=arm64 --libc=glibc sharp
+      - name: Remove musl-based binary # @npm/cli#6914
+        run: rm -rf node_modules/@img/*-linuxmusl*
       - name: Get sharp version
         id: version
         uses: notiz-dev/github-action-json-property@release
@@ -49,7 +51,9 @@ jobs:
         run: rm -rf nodejs node_modules # keep package.json for keeping the version
 
       - name: Install sharp - x64
-        run: npm i --save-exact --os=linux --cpu=x64 sharp
+        run: npm i --save-exact --os=linux --cpu=x64 --libc=glibc sharp
+      - name: Remove musl-based binary # @npm/cli#6914
+        run: rm -rf node_modules/@img/*-linuxmusl*
       - name: esbuild - x64
         run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
       - name: Zip - x64
@@ -66,8 +70,10 @@ jobs:
 
       - name: Install sharp - all
         run: |
-          npm i --os=linux --cpu=x64 sharp
-          npm i --os=linux --cpu=arm64 sharp
+          npm i --os=linux --cpu=x64 --libc=glibc sharp
+          npm i --os=linux --cpu=arm64 --libc=glibc sharp
+      - name: Remove musl-based binary # @npm/cli#6914
+        run: rm -rf node_modules/@img/*-linuxmusl*
       - name: esbuild - all
         run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
       - name: Zip - all
