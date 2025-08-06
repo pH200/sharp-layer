@@ -33,9 +33,11 @@ import sharp from 'sharp'
 
 Check out [aws: Creating and sharing Lambda layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) for more details.
 
-This package can be used with [sst](https://sst.dev). Check out [docs.sst.dev: Lambda Layers](https://docs.sst.dev/advanced/lambda-layers) and [sst.dev: Resize Images](https://sst.dev/examples/how-to-automatically-resize-images-with-serverless.html) for examples.
+This package can be used with [sst v2](https://v2.sst.dev). Check out [docs.sst.dev: Lambda Layers](https://v2.sst.dev/advanced/lambda-layers) and [sst.dev: Resize Images](https://guide.sst.dev/examples/how-to-automatically-resize-images-with-serverless.html) for examples.
 
-### Setting arm64 for sst functions
+For [sst v3](https://sst.dev), you need to set `sharp` in the `nodejs.install` array. [Check out the example](https://sst.dev/docs/examples/#sharp-image-resizer).
+
+### Setting arm64 for sst v2 functions
 
 ```js
 function: {
