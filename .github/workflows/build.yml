@@ -18,11 +18,11 @@ jobs:
       contents: write
     steps:
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '^20.10.0'
+          node-version: 'lts/jod'
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: Install esbuild
         run: npm i -g esbuild@0.18.20
 
@@ -37,12 +37,13 @@ jobs:
           path: 'package.json'
           prop_path: 'dependencies.sharp'
       - name: esbuild - arm64
-        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
+        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node --external:sharp --external:@img/*
       - name: Zip - arm64
         run: |
           mkdir -p nodejs/node_modules/sharp/lib
           mv index.js nodejs/node_modules/sharp/lib/
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
+          node -e "const fs = require('node:fs'); const file = 'nodejs/node_modules/sharp/package.json'; const pkg = JSON.parse(fs.readFileSync(file, 'utf8')); pkg.main = './lib/index.js'; pkg.types = './lib/index.d.ts'; pkg.exports = { ...(pkg.exports || {}), '.': { types: './lib/index.d.ts', import: './lib/index.js', require: './lib/index.js' } }; fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n');"
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
           mv node_modules/@img nodejs/node_modules/
@@ -55,12 +56,13 @@ jobs:
       - name: Remove musl-based binary # @npm/cli#6914
         run: rm -rf node_modules/@img/*-linuxmusl*
       - name: esbuild - x64
-        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
+        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node --external:sharp --external:@img/*
       - name: Zip - x64
         run: |
           mkdir -p nodejs/node_modules/sharp/lib
           mv index.js nodejs/node_modules/sharp/lib/
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
+          node -e "const fs = require('node:fs'); const file = 'nodejs/node_modules/sharp/package.json'; const pkg = JSON.parse(fs.readFileSync(file, 'utf8')); pkg.main = './lib/index.js'; pkg.types = './lib/index.d.ts'; pkg.exports = { ...(pkg.exports || {}), '.': { types: './lib/index.d.ts', import: './lib/index.js', require: './lib/index.js' } }; fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n');"
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
           mv node_modules/@img nodejs/node_modules/
@@ -75,12 +77,13 @@ jobs:
       - name: Remove musl-based binary # @npm/cli#6914
         run: rm -rf node_modules/@img/*-linuxmusl*
       - name: esbuild - all
-        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node
+        run: esbuild --bundle ./node_modules/sharp/ --outfile=index.js --minify --format=cjs --platform=node --external:sharp --external:@img/*
       - name: Zip - all
         run: |
           mkdir -p nodejs/node_modules/sharp/lib
           mv index.js nodejs/node_modules/sharp/lib/
           mv node_modules/sharp/package.json nodejs/node_modules/sharp/
+          node -e "const fs = require('node:fs'); const file = 'nodejs/node_modules/sharp/package.json'; const pkg = JSON.parse(fs.readFileSync(file, 'utf8')); pkg.main = './lib/index.js'; pkg.types = './lib/index.d.ts'; pkg.exports = { ...(pkg.exports || {}), '.': { types: './lib/index.d.ts', import: './lib/index.js', require: './lib/index.js' } }; fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n');"
           mv node_modules/sharp/LICENSE nodejs/node_modules/sharp/
           mv node_modules/sharp/lib/index.d.ts nodejs/node_modules/sharp/lib/
           mv node_modules/@img nodejs/node_modules/
